@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingredient Checker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">🍎 Ingredient Checker</h1>
+            <p class="tagline">Upload and analyze food ingredients instantly</p>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📷</div>
+                    <h2>Upload Ingredient Image</h2>
+                    <p>Drag and drop an image or click to browse</p>
+                    <input type="file" id="imageInput" accept="image/*" hidden>
+                    <button class="upload-btn" id="uploadBtn">Choose Image</button>
+                </div>
+            </div>
+
+            <div class="loading-section hidden" id="loadingSection">
+                <div class="loader"></div>
+                <p>Analyzing ingredients...</p>
+            </div>
+
+            <div class="results-section hidden" id="resultsSection">
+                <h2>Analysis Results</h2>
+                <div class="results-container" id="resultsContainer">
+                </div>
+                <button class="reset-btn" id="resetBtn">Analyze Another Image</button>
+            </div>
+
+            <div class="error-section hidden" id="errorSection">
+                <div class="error-message">
+                    <h3>❌ Error</h3>
+                    <p id="errorText"></p>
+                    <button class="retry-btn" id="retryBtn">Try Again</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Ingredient Checker. Built for healthier choices.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
