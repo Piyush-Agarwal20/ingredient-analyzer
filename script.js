@@ -2,12 +2,11 @@ class IngredientChecker {
     constructor() {
         this.apiUrl = 'https://practicefoote.xyz/webhook-test/7caac64c-2c03-46a1-a8cf-305e76fdee63';
         
-        // Cloudinary configuration - you'll provide these
+        // Cloudinary configuration - only public info
         this.cloudinaryConfig = {
-            cloudName: 'YOUR_CLOUD_NAME',    // Get from cloudinary dashboard
-            uploadPreset: 'YOUR_UPLOAD_PRESET', // Create an unsigned upload preset
-            apiKey: 'YOUR_API_KEY',          // Optional: for signed uploads
-            apiSecret: 'YOUR_API_SECRET'     // Optional: for signed uploads (keep secure)
+            cloudName: 'dmsjppgwj',    // This is safe to expose
+            uploadPreset: 'ingredient_checker', // Unsigned preset - safe to expose
+            // NEVER put apiKey/apiSecret in client-side code!
         };
         
         this.currentImage = null;
@@ -31,7 +30,10 @@ class IngredientChecker {
     }
 
     bindEvents() {
-        this.uploadBtn.addEventListener('click', () => this.imageInput.click());
+        this.uploadBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.imageInput.click();
+        });
         this.imageInput.addEventListener('change', (e) => this.handleFileSelect(e));
         this.resetBtn.addEventListener('click', () => this.resetApp());
         this.retryBtn.addEventListener('click', () => this.resetApp());
@@ -39,7 +41,14 @@ class IngredientChecker {
         this.uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
         this.uploadArea.addEventListener('dragleave', (e) => this.handleDragLeave(e));
         this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
-        this.uploadArea.addEventListener('click', () => this.imageInput.click());
+        this.uploadArea.addEventListener('click', (e) => {
+            // Don't trigger if clicked on the button or its children
+            if (e.target === this.uploadBtn || this.uploadBtn.contains(e.target)) {
+                return;
+            }
+            this.imageInput.click();
+        });
+
     }
 
     handleDragOver(e) {
@@ -81,6 +90,7 @@ class IngredientChecker {
         }
 
         this.currentImage = file;
+        this.setImagePreview(file);
         this.analyzeImage();
     }
 
@@ -98,8 +108,34 @@ class IngredientChecker {
         });
     }
 
+    setImagePreview(file) {
+        const previewImage = document.getElementById('previewImage');
+        if (previewImage) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    clearImagePreview() {
+        const previewImage = document.getElementById('previewImage');
+        if (previewImage) {
+            previewImage.src = '';
+        }
+    }
+
+
     async uploadToCloudinary(file) {
         try {
+            console.log('Attempting Cloudinary upload with config:', {
+                cloudName: this.cloudinaryConfig.cloudName,
+                uploadPreset: this.cloudinaryConfig.uploadPreset,
+                fileType: file.type,
+                fileSize: file.size
+            });
+            
             const formData = new FormData();
             formData.append('file', file);
             formData.append('upload_preset', this.cloudinaryConfig.uploadPreset);
@@ -118,11 +154,16 @@ class IngredientChecker {
                 }
             );
             
-            if (!response.ok) {
-                throw new Error(`Cloudinary upload failed: ${response.status}`);
-            }
-            
             const result = await response.json();
+            
+            if (!response.ok) {
+                console.error('Cloudinary upload failed:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    error: result.error || result
+                });
+                throw new Error(`Cloudinary upload failed: ${response.status} - ${JSON.stringify(result.error || result)}`);
+            }
             
             if (result.error) {
                 throw new Error('Cloudinary upload failed: ' + result.error.message);
@@ -143,7 +184,7 @@ class IngredientChecker {
             return;
         }
 
-        if (!this.cloudinaryConfig.cloudName || this.cloudinaryConfig.cloudName === 'YOUR_CLOUD_NAME') {
+        if (!this.cloudinaryConfig.cloudName || !this.cloudinaryConfig.uploadPreset) {
             this.showError('Cloudinary not configured. Please set your cloud name and upload preset.');
             return;
         }
@@ -173,7 +214,24 @@ class IngredientChecker {
             }
 
             const result = await response.json();
-            this.displayResults(result);
+            
+            // Handle the new API response structure
+            if (result.success && result.data) {
+                // Check if ingredients were found in the image
+                if (result.data.ingredient === true && result.data.data) {
+                    this.displayResults(result.data.data);
+                } else if (result.data.ingredient === false) {
+                    this.showError('Ingredient not found in the image');
+                    return;
+                } else {
+                    this.showError('No ingredient data received');
+                    return;
+                }
+            } else {
+                // Show the specific error message from the API response
+                this.showError(result.message || 'Analysis failed');
+                return;
+            }
         } catch (error) {
             console.error('Analysis error:', error);
             this.showError(this.getErrorMessage(error));
@@ -211,7 +269,7 @@ class IngredientChecker {
     }
 
     createIngredientElement(ingredient) {
-        const { name, status, reason } = ingredient;
+        const { ingredient: name, status, effect: reason } = ingredient;
         
         const element = document.createElement('div');
         element.className = 'ingredient-item';
@@ -241,13 +299,9 @@ class IngredientChecker {
     getStatusClass(status) {
         const statusMap = {
             'healthy': 'status-healthy',
-            'good to eat': 'status-good',
-            'good': 'status-good',
-            'neutral': 'status-neutral',
-            'bad': 'status-bad',
-            'very bad': 'status-very-bad',
-            'don\'t touch': 'status-dont-touch',
-            'dont touch': 'status-dont-touch'
+            'okay': 'status-good',
+            'can eat': 'status-good',
+            'avoid': 'status-bad'
         };
         return statusMap[status.toLowerCase()] || 'status-neutral';
     }
@@ -255,13 +309,9 @@ class IngredientChecker {
     getStatusColor(status) {
         const colorMap = {
             'healthy': '#27ae60',
-            'good to eat': '#2ecc71',
-            'good': '#2ecc71',
-            'neutral': '#f39c12',
-            'bad': '#e74c3c',
-            'very bad': '#c0392b',
-            'don\'t touch': '#8e44ad',
-            'dont touch': '#8e44ad'
+            'okay': '#2ecc71',
+            'can eat': '#2ecc71',
+            'avoid': '#e74c3c'
         };
         return colorMap[status.toLowerCase()] || '#f39c12';
     }
@@ -269,13 +319,9 @@ class IngredientChecker {
     getStatusBackgroundColor(status) {
         const bgColorMap = {
             'healthy': 'rgba(39, 174, 96, 0.05)',
-            'good to eat': 'rgba(46, 204, 113, 0.05)',
-            'good': 'rgba(46, 204, 113, 0.05)',
-            'neutral': 'rgba(243, 156, 18, 0.05)',
-            'bad': 'rgba(231, 76, 60, 0.05)',
-            'very bad': 'rgba(192, 57, 43, 0.05)',
-            'don\'t touch': 'rgba(142, 68, 173, 0.05)',
-            'dont touch': 'rgba(142, 68, 173, 0.05)'
+            'okay': 'rgba(46, 204, 113, 0.05)',
+            'can eat': 'rgba(46, 204, 113, 0.05)',
+            'avoid': 'rgba(231, 76, 60, 0.05)'
         };
         return bgColorMap[status.toLowerCase()] || 'rgba(243, 156, 18, 0.05)';
     }
@@ -283,13 +329,9 @@ class IngredientChecker {
     getStatusIcon(status) {
         const iconMap = {
             'healthy': '✓',
-            'good to eat': '✓',
-            'good': '✓',
-            'neutral': '?',
-            'bad': '!',
-            'very bad': '!!',
-            'don\'t touch': '✕',
-            'dont touch': '✕'
+            'okay': '✓',
+            'can eat': '✓',
+            'avoid': '!'
         };
         return iconMap[status.toLowerCase()] || '?';
     }
@@ -335,6 +377,7 @@ class IngredientChecker {
         this.currentImage = null;
         this.imageInput.value = '';
         this.resultsContainer.innerHTML = '';
+        this.clearImagePreview();
         this.showSection('upload');
     }
 
