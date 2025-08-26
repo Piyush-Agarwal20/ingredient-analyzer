@@ -9,8 +9,13 @@
 <body>
     <header class="header">
         <div class="container">
-            <h1 class="logo">🍎 Ingredient Checker</h1>
-            <p class="tagline">Upload and analyze food ingredients instantly</p>
+            <div class="header-content">
+                <div class="header-text">
+                    <h1 class="logo">🍎 Ingredient Checker</h1>
+                    <p class="tagline">Upload and analyze food ingredients instantly</p>
+                </div>
+                <button class="try-image-btn" id="tryImageBtn">📷 Try Image</button>
+            </div>
         </div>
     </header>
 
@@ -20,9 +25,13 @@
                 <div class="upload-area" id="uploadArea">
                     <div class="upload-icon">📷</div>
                     <h2>Upload Ingredient Image</h2>
-                    <p>Drag and drop an image or click to browse</p>
+                    <p>Drag and drop an image, click to browse, or take a photo</p>
                     <input type="file" id="imageInput" accept="image/*" hidden>
-                    <button class="upload-btn" id="uploadBtn">Choose Image</button>
+                    <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
+                    <div class="upload-buttons">
+                        <button class="upload-btn" id="uploadBtn">📁 Choose Image</button>
+                        <button class="camera-btn" id="cameraBtn">📷 Take Photo</button>
+                    </div>
                 </div>
             </div>
 

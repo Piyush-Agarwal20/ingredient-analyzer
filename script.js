@@ -22,7 +22,10 @@ class IngredientChecker {
         
         this.uploadArea = document.getElementById('uploadArea');
         this.imageInput = document.getElementById('imageInput');
+        this.cameraInput = document.getElementById('cameraInput');
         this.uploadBtn = document.getElementById('uploadBtn');
+        this.cameraBtn = document.getElementById('cameraBtn');
+        this.tryImageBtn = document.getElementById('tryImageBtn');
         this.resultsContainer = document.getElementById('resultsContainer');
         this.resetBtn = document.getElementById('resetBtn');
         this.retryBtn = document.getElementById('retryBtn');
@@ -34,7 +37,15 @@ class IngredientChecker {
             e.stopPropagation();
             this.imageInput.click();
         });
+        this.cameraBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.cameraInput.click();
+        });
+        this.tryImageBtn.addEventListener('click', () => {
+            this.showSection('upload');
+        });
         this.imageInput.addEventListener('change', (e) => this.handleFileSelect(e));
+        this.cameraInput.addEventListener('change', (e) => this.handleFileSelect(e));
         this.resetBtn.addEventListener('click', () => this.resetApp());
         this.retryBtn.addEventListener('click', () => this.resetApp());
 
@@ -42,8 +53,9 @@ class IngredientChecker {
         this.uploadArea.addEventListener('dragleave', (e) => this.handleDragLeave(e));
         this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
         this.uploadArea.addEventListener('click', (e) => {
-            // Don't trigger if clicked on the button or its children
-            if (e.target === this.uploadBtn || this.uploadBtn.contains(e.target)) {
+            // Don't trigger if clicked on any button or its children
+            if (e.target === this.uploadBtn || this.uploadBtn.contains(e.target) ||
+                e.target === this.cameraBtn || this.cameraBtn.contains(e.target)) {
                 return;
             }
             this.imageInput.click();

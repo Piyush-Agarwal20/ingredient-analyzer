@@ -26,8 +26,19 @@ body {
     border-bottom: 1px solid rgba(59, 130, 246, 0.3);
     box-shadow: 0 4px 30px rgba(59, 130, 246, 0.1);
     padding: 1rem 0;
-    text-align: center;
     flex-shrink: 0;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-text {
+    text-align: center;
+    flex: 1;
 }
 
 .logo {
@@ -120,24 +131,25 @@ body {
     font-size: 1.1rem;
 }
 
-.upload-btn {
+.try-image-btn {
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
     color: white;
     border: none;
-    padding: 1.2rem 2.5rem;
+    padding: 0.8rem 1.5rem;
     border-radius: 50px;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.4s ease;
     box-shadow: 
-        0 10px 25px rgba(59, 130, 246, 0.3),
-        0 0 20px rgba(59, 130, 246, 0.2);
+        0 8px 20px rgba(59, 130, 246, 0.3),
+        0 0 15px rgba(59, 130, 246, 0.2);
     position: relative;
     overflow: hidden;
+    white-space: nowrap;
 }
 
-.upload-btn::before {
+.try-image-btn::before {
     content: '';
     position: absolute;
     top: 0;
@@ -148,11 +160,58 @@ body {
     transition: left 0.5s;
 }
 
-.upload-btn:hover::before {
+.try-image-btn:hover::before {
     left: 100%;
 }
 
-.upload-btn:hover {
+.try-image-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 30px rgba(59, 130, 246, 0.4),
+        0 0 25px rgba(59, 130, 246, 0.3);
+}
+
+.upload-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.upload-btn, .camera-btn {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    padding: 1.2rem 2rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    box-shadow: 
+        0 10px 25px rgba(59, 130, 246, 0.3),
+        0 0 20px rgba(59, 130, 246, 0.2);
+    position: relative;
+    overflow: hidden;
+    min-width: 150px;
+}
+
+.upload-btn::before, .camera-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.upload-btn:hover::before, .camera-btn:hover::before {
+    left: 100%;
+}
+
+.upload-btn:hover, .camera-btn:hover {
     transform: translateY(-3px);
     box-shadow: 
         0 15px 35px rgba(59, 130, 246, 0.4),
@@ -391,6 +450,11 @@ body {
         padding: 0 15px;
     }
     
+    .header-content {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+    
     .results-layout {
         flex-direction: column;
         gap: 1.5rem;
@@ -429,9 +493,14 @@ body {
         font-size: 3rem;
     }
     
-    .upload-btn {
-        padding: 1rem 2rem;
-        font-size: 1rem;
+    .upload-buttons {
+        gap: 0.8rem;
+    }
+    
+    .upload-btn, .camera-btn {
+        padding: 1rem 1.8rem;
+        font-size: 0.95rem;
+        min-width: 145px;
     }
     
     .results-section h2 {
@@ -478,9 +547,21 @@ body {
         font-size: 0.95rem;
     }
     
-    .upload-btn {
-        padding: 0.9rem 1.8rem;
-        font-size: 0.95rem;
+    .upload-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    
+    .upload-btn, .camera-btn {
+        padding: 0.9rem 1.5rem;
+        font-size: 0.9rem;
+        min-width: 140px;
+    }
+    
+    .try-image-btn {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.8rem;
     }
     
     .results-layout {
