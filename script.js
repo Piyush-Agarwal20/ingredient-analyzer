@@ -1,6 +1,6 @@
 class IngredientChecker {
     constructor() {
-        this.apiUrl = 'https://practicefoote.xyz/webhook-test/7caac64c-2c03-46a1-a8cf-305e76fdee63';
+        this.apiUrl = 'https://practicefoote.xyz/webhook/7caac64c-2c03-46a1-a8cf-305e76fdee63';
         
         // Cloudinary configuration - only public info
         this.cloudinaryConfig = {
@@ -34,10 +34,12 @@ class IngredientChecker {
 
     bindEvents() {
         this.uploadBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
             this.imageInput.click();
         });
         this.cameraBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
             this.cameraInput.click();
         });
@@ -55,7 +57,8 @@ class IngredientChecker {
         this.uploadArea.addEventListener('click', (e) => {
             // Don't trigger if clicked on any button or its children
             if (e.target === this.uploadBtn || this.uploadBtn.contains(e.target) ||
-                e.target === this.cameraBtn || this.cameraBtn.contains(e.target)) {
+                e.target === this.cameraBtn || this.cameraBtn.contains(e.target) ||
+                e.target.closest('.upload-buttons')) {
                 return;
             }
             this.imageInput.click();
